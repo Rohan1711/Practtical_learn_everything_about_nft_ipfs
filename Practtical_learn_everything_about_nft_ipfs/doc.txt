@@ -1,0 +1,73 @@
+1) Write a Solidity Smart Contract for a Complete ERC721
+Smart Contract where you can perform Minting the NFT
+by paying in Ethers, Limiting the supply of NFT’s,
+Allowing list functionality, Modifying the Minting
+functionality, Withdrawing functionality, and, clean up
+code by using internalMint() function.
+
+Ans-
+A complete ERC721 smart contract where use some funcationality 
+1.minting the NFT by paying in ethers.
+2.limiting the supply
+3.allow list functionality
+4.modifying the minting functionality
+5.withdraw functionality
+6.clean up code by using internalMint()
+
+//SPDX-Liecence_identifier :MIT
+pragma solidity ^0.8.20;
+
+contract CompleteNFT is ERC721, ERC721Enumarable, Ownable {
+    using Counter for Counters.Counter ;
+    uint Max_Supply =1;
+    bool private allowListOpen;
+    bool private publicOpen;
+
+    mapping(address=>bool) public allowList;
+    Counter.counter private _tokenIdCounter;
+    constructor() ERC721("CompleteNFT", "CNFT")
+    {
+        function _baseURI() internal pure override returns (string memory)
+        {
+            return 
+            "address" //ifps address 
+        }
+        function allowListMint() public payable{
+            require(allowListOpen,"Mint is not open");
+            require(allowList[msg.sender], "you are not on the allow list");
+            require(msg.value==0.001 ether, "insufficienet funds");
+            internalMint();
+        }
+        function publicMint() internal {
+            require(publicOpen,"mint is not open");
+            require(msg.value==0.01 ether,"insufficienet fund");
+            internalMint();
+        }
+        function internalMint() internal {
+            require(totalSupply() < Max_Supply, "we sold out");
+            uint256 tokenID=_tokenIdCounter.current();
+            _tokenIdCounter.increment();
+            _safeMint(msg.sender,tokenID);
+        }
+
+        function editMintWindow(bool _allowListOpen,bool _publicMintOpen) external onlyowner {
+            publicOpen=_publicMintOpen;
+            allowListOpen=_allowListOpen;
+        }
+        function setAllowList(address[] memory addresses )external onlyowner {
+            for(uint i=0;i<addresses.lenght;i++);
+            allowList[addresses[i]]=true;
+        }
+    }
+        function withdraw() external onlyowner{
+            uint bal =address(this).balance;
+            payable(msg.sender).transfer(bal);
+        }
+
+        function _beforeTokenTransfer(address from, address to, uint tokenID, uint256 batchSize)
+        internal override (ERC721,ERC721Enumarable)
+        return (bool){
+            return super.supportInterfcace(interfaceID);
+        }
+        
+}
